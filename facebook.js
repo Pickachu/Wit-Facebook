@@ -6,7 +6,7 @@ const request = require('request');
 const Config = require('./const.js');
 
 const fbReq = request.defaults({
-  uri: 'https://graph.facebook.com/v2.7/me/messages',
+  uri: 'https://graph.facebook.com/v2.6/me/messages',
   method: 'POST',
   json: true,
   qs: {
