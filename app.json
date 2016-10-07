@@ -4,9 +4,6 @@
   "repository": "https://github.com/Pickachu/eleanto",
   "logo": "https://avatars2.githubusercontent.com/u/4723433",
   "keywords": ["node", "express", "github", "wit", "bot", "facebook"],
-  "engines": {
-    "node": "6.5.0"
-  },
   "env": {
     "WIT_TOKEN": {
       "description": "Server Access Token from wit.ai (see your wit app settings).",
