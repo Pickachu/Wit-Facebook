@@ -18,7 +18,8 @@ const firstEntityValue = (entities, entity) => {
 };
 
 const messageFromResponse = (response) => {
-  let {text, quickreplies: titles} = response;
+  let titles = response.quickreplies;
+  let text = response.text;
   let replies = [];
 
   if (titles) {
@@ -33,7 +34,7 @@ const messageFromResponse = (response) => {
 // Bot actions
 const actions = {
   send(request, response) {
-    let {context} = request;
+    let context = request.context;
     let message = messageFromResponse(response);
     console.log(request, response, message);
 
