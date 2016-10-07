@@ -28,7 +28,7 @@ const fbMessage = (recipientId, message, cb) => {
     },
   };
 
-  request(options, (err, resp, data) => {
+  return request(options, (err, resp, data) => {
     if (cb) {
       cb(err || data.error && data.error.message, data);
     }
