@@ -1,9 +1,12 @@
 {
-  "name": "Wit-Facebook-bot",
-  "description": "Wit-Facebook Messenger Bot Demo.",
-  "repository": "https://github.com/hunkim/Wit-Facebook",
+  "name": "Sleep Egg Prototype",
+  "description": "Wit-Facebook Messenger Sleep Bot Demo.",
+  "repository": "https://github.com/Pickachu/eleanto",
   "logo": "https://avatars2.githubusercontent.com/u/4723433",
-  "keywords": ["node", "express", "github", "wit", "bot", "fcaebook"],
+  "keywords": ["node", "express", "github", "wit", "bot", "facebook"],
+  "engines": {
+    "node": "6.2.0"
+  },
   "env": {
     "WIT_TOKEN": {
       "description": "Server Access Token from wit.ai (see your wit app settings).",
