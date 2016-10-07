@@ -19,15 +19,15 @@ const firstEntityValue = (entities, entity) => {
 
 const messageFromResponse = (response) => {
   let {text, quickreplies: titles} = response;
-  let replies = [];
+  let quick_replies = [];
 
   if (titles) {
-    replies = titles.map((title) => {
+    quick_replies = titles.map((title) => {
       return {title, payload: null, content_type: 'text'}
     });
   }
 
-  return {text, replies}
+  return {text, quick_replies}
 }
 
 // Bot actions
