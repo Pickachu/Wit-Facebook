@@ -18,8 +18,7 @@ const firstEntityValue = (entities, entity) => {
 };
 
 const messageFromResponse = (response) => {
-  let titles = response.quickreplies;
-  let text = response.text;
+  let {text, quickreplies: titles} = response;
   let replies = [];
 
   if (titles) {
@@ -28,13 +27,13 @@ const messageFromResponse = (response) => {
     });
   }
 
-  return {text: text, replies: replies}
+  return {text, replies}
 }
 
 // Bot actions
 const actions = {
   send(request, response) {
-    let context = request.context;
+    let {context} = request;
     let message = messageFromResponse(response);
     console.log(request, response, message);
 
@@ -96,7 +95,7 @@ const actions = {
 
 
 const getWit = () => {
-  return Wit({accessToken: Config.WIT_TOKEN, actions: actions});
+  return Wit({accessToken: Config.WIT_TOKEN, actions});
 };
 
 exports.getWit = getWit;
