@@ -17,16 +17,32 @@ const firstEntityValue = (entities, entity) => {
   return typeof val === 'object' ? val.value : val;
 };
 
+const messageFromResponse = (response) => {
+  let {text, quickreplies: titles} = response;
+  let replies = [];
+
+  if (titles) {
+    replies = titles.map((title) => {
+      return {title, payload: null, content_type: 'text'}
+    });
+  }
+
+  return {text, replies}
+}
+
 // Bot actions
 const actions = {
-  say(sessionId, context, message, cb) {
-    console.log(message);
+  send(request, response) {
+    let {context} = request;
+    let message = messageFromResponse(response);
+    console.log(request, response, message);
 
     // Bot testing mode, run cb() and return
     if (require.main === module) {
-      cb();
-      return;
+      return Promise.resolve();
     }
+
+
 
     // Our bot has something to say!
     // Let's retrieve the Facebook user whose session belongs to from context
@@ -79,7 +95,7 @@ const actions = {
 
 
 const getWit = () => {
-  return new Wit(Config.WIT_TOKEN, actions);
+  return Wit({accessToken: Config.WIT_TOKEN, actions});
 };
 
 exports.getWit = getWit;
@@ -88,6 +104,6 @@ exports.getWit = getWit;
 // http://stackoverflow.com/questions/6398196
 if (require.main === module) {
   console.log("Bot testing mode.");
-  const client = getWit();
-  client.interactive();
+  const interactive = require('node-wit').interactive;
+  interactive(getWit());
 }

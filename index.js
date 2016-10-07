@@ -99,7 +99,7 @@ app.post('/webhook', (req, res) => {
       // Let's reply with an automatic message
       FB.fbMessage(
         sender,
-        'Sorry I can only process text messages for now.'
+        {text: 'Me desculpe, eu só entendo mensagens de texto por agora.'}
       );
     } else if (msg) {
       // We received a text message
@@ -108,7 +108,7 @@ app.post('/webhook', (req, res) => {
       // This will run all actions until our bot has nothing left to do
       wit.runActions(
         sessionId, // the user's current session
-        msg, // the user's message 
+        msg, // the user's message
         sessions[sessionId].context, // the user's current session state
         (error, context) => {
           if (error) {
