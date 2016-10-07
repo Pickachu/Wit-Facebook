@@ -28,7 +28,7 @@ const messageFromResponse = (response) => {
     });
   }
 
-  return {text, replies}
+  return {text: text, replies: replies}
 }
 
 // Bot actions
@@ -96,7 +96,7 @@ const actions = {
 
 
 const getWit = () => {
-  return Wit({accessToken: Config.WIT_TOKEN, actions});
+  return Wit({accessToken: Config.WIT_TOKEN, actions: actions});
 };
 
 exports.getWit = getWit;
