@@ -30,69 +30,89 @@ const messageFromResponse = (response) => {
   return {text, quick_replies}
 }
 
+const respond = (context, message) => {
+  return new Promise((resolve, reject) => {
+    // Bot testing mode, return
+    if (require.main === module) {
+      return resolve();
+    }
+
+    // Our bot has something to say!
+    // Let's retrieve the Facebook user whose session belongs to from context
+    // TODO: need to get Facebook user name
+    const recipientId = context._fbid_;
+    if (recipientId) {
+      // Yay, we found our recipient!
+      // Let's forward our bot response to her.
+      FB.fbMessage(recipientId, message, (err, data) => {
+        if (err) {
+          console.log(
+            'Oops! An error occurred while forwarding the response to',
+            recipientId,
+            ':',
+            err
+          );
+        }
+
+        // Let's give the wheel back to our bot
+        resolve();
+      });
+    } else {
+      console.log('Oops! Couldn\'t find user in context:', context);
+      // Giving the wheel back to our bot
+      resolve();
+    }
+  });
+}
+
+const logRequest = (request, response) => {
+  let {context, entities} = request;
+  let {quickreplies} = response;
+  quickreplies || (quickreplies = []);
+
+  let log = "";
+  log += `=> ${request.text} | ${JSON.stringify(context)} \n`
+  log += `   {${Object.keys(entities || {}).join(',')}} \n`
+
+  log += `<= ${response.text} \n`
+  log += `   [${quickreplies.join('] [')}] \n`
+
+  console.log(log);
+};
+
 // Bot actions
 const actions = {
   send(request, response) {
-    return new Promise((resolve, reject) => {
-      let {context} = request;
-      let message = messageFromResponse(response);
-      console.log(request, response, message);
+    let {context} = request;
+    let message = messageFromResponse(response);
+    logRequest(request, response);
 
-      // Bot testing mode, run cb() and return
-      if (require.main === module) {
-        return Promise.resolve();
-      }
-
-
-
-      // Our bot has something to say!
-      // Let's retrieve the Facebook user whose session belongs to from context
-      // TODO: need to get Facebook user name
-      const recipientId = context._fbid_;
-      if (recipientId) {
-        // Yay, we found our recipient!
-        // Let's forward our bot response to her.
-        FB.fbMessage(recipientId, message, (err, data) => {
-          if (err) {
-            console.log(
-              'Oops! An error occurred while forwarding the response to',
-              recipientId,
-              ':',
-              err
-            );
-          }
-
-          // Let's give the wheel back to our bot
-          resolve();
-        });
-      } else {
-        console.log('Oops! Couldn\'t find user in context:', context);
-        // Giving the wheel back to our bot
-        resolve();
-      }
-    });
+    return respond(context, message);
   },
-  merge(sessionId, context, entities, message, cb) {
-    // Retrieve the location entity and store it into a context field
-    const loc = firstEntityValue(entities, 'location');
-    if (loc) {
-      context.loc = loc; // store it in context
+
+  ['assess-sleep-quality-based-on-duration'](request) {
+    let {context, entities} = request;
+    let message, sends = [], duration = firstEntityValue(entities, 'duration');
+
+
+    console.log('assess-sleep-quality-based-on-duration | ', JSON.stringify(context));
+    console.log(`   {${Object.keys(entities || {}).join(',')}} \n`);
+
+    console.log('<=', `${duration} horas...`);
+    sends.push(respond(context, `${duration} horas...`));
+
+    if (duration < 7.5) {
+      message = "Parece que você dormiu pouco";
+    } else if (duration == 8) {
+      message = "Parece uma quantidade boa";
+    } else if (duration > 8.5) {
+      message = "Acho que você dormiu demais";
     }
 
-    cb(context);
-  },
-
-  error(sessionId, context, error) {
-    console.log(error.message);
-  },
-
-  // fetch-weather bot executes
-  ['fetch-weather'](sessionId, context, cb) {
-    // Here should go the api call, e.g.:
-    // context.forecast = apiCall(context.loc)
-    context.forecast = 'sunny';
-    cb(context);
-  },
+    console.log('<=', message);
+    sends.push(respond(context, message));
+    return Promise.all(sends);
+  }
 };
 
 
