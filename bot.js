@@ -96,6 +96,7 @@ const actions = {
 
 
     console.log('assess-sleep-quality-based-on-duration | ', JSON.stringify(context));
+    console.log(arguments);
     console.log(`   {${Object.keys(entities || {}).join(',')}} \n`);
 
     console.log('<=', `${duration} horas...`);
@@ -111,13 +112,14 @@ const actions = {
 
     console.log('<=', message);
     sends.push(respond(context, {text: message}));
-    return Promise.all(sends);
+    return Promise.all(sends)
+      .then(() => Promise.resolve(context));
   }
 };
 
 
-const getWit = () => {
-  return Wit({accessToken: Config.WIT_TOKEN, actions});
+const getWit = (options) => {
+  return Wit(Object.assign({accessToken: Config.WIT_TOKEN, actions}, options));
 };
 
 exports.getWit = getWit;
@@ -127,5 +129,6 @@ exports.getWit = getWit;
 if (require.main === module) {
   console.log("Bot testing mode.");
   const interactive = require('node-wit').interactive;
-  interactive(getWit());
+  console.debug = console.log;
+  interactive(getWit({logger: console}));
 }
