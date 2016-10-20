@@ -99,7 +99,7 @@ const actions = {
     console.log(`   {${Object.keys(entities || {}).join(',')}} \n`);
 
     console.log('<=', `${duration} horas...`);
-    sends.push(respond(context, `${duration} horas...`));
+    sends.push(respond(context, {text: `${duration} horas...`}));
 
     if (duration < 7.5) {
       message = "Parece que você dormiu pouco";
@@ -110,7 +110,7 @@ const actions = {
     }
 
     console.log('<=', message);
-    sends.push(respond(context, message));
+    sends.push(respond(context, {text: message}));
     return Promise.all(sends);
   }
 };
