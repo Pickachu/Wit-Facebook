@@ -106,11 +106,11 @@ app.post('/webhook', (req, res) => {
           sessions[sessionId].scalated = false;
         };
 
-        return;
+        return res.sendStatus(200);
       }
 
       // Humans have taken over this session :P
-      if (sessions[sessionId].scalated) return;
+      if (sessions[sessionId].scalated) return res.sendStatus(200);
 
       if (atts) {
         // We received an attachment
