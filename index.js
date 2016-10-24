@@ -132,7 +132,7 @@ app.post('/webhook', (req, res) => {
       );
     }
   } else {
-    console.log("Unimplemented parse for request body:", req.body);
+    console.log("Unimplemented parse for request body: %j", req.body);
   }
   res.sendStatus(200);
 });
