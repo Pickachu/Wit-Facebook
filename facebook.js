@@ -58,7 +58,7 @@ const getPostbackPayload = (body) => {
     body.entry &&
     Array.isArray(body.entry) &&
     body.entry.length > 0 &&
-    body.entry[0] && TODO!qeqw asd
+    body.entry[0];
 }
 
 
