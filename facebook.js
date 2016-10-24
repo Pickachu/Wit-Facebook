@@ -52,18 +52,7 @@ const getFirstMessagingEntry = (body) => {
   return val || null;
 };
 
-
-const getPostbackPayload = (body) => {
-  return body.object === 'page' &&
-    body.entry &&
-    Array.isArray(body.entry) &&
-    body.entry.length > 0 &&
-    body.entry[0];
-}
-
-
 module.exports = {
-  getPostbackPayload: getPostbackPayload,
   getFirstMessagingEntry: getFirstMessagingEntry,
   fbMessage: fbMessage,
   fbReq: request

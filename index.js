@@ -78,58 +78,103 @@ app.get('/webhook', (req, res) => {
 app.post('/webhook', (req, res) => {
   // Parsing the Messenger API response
   const messaging = FB.getFirstMessagingEntry(req.body);
-  if (messaging && messaging.message) {
+  if (messaging) {
 
-    // Yay! We got a new message!
+    if (messaging.message) {
 
-    // We retrieve the Facebook user ID of the sender
-    const sender = messaging.sender.id;
+      // Yay! We got a new message!
 
-    // We retrieve the user's current session, or create one if it doesn't exist
-    // This is needed for our bot to figure out the conversation history
-    const sessionId = findOrCreateSession(sender);
+      // We retrieve the Facebook user ID of the sender
+      const sender = messaging.sender.id;
 
-    // We retrieve the message content
-    const msg = messaging.message.text;
-    const atts = messaging.message.attachments;
+      // We retrieve the user's current session, or create one if it doesn't exist
+      // This is needed for our bot to figure out the conversation history
+      const sessionId = findOrCreateSession(sender);
 
-    if (atts) {
-      // We received an attachment
+      // We retrieve the message content
+      const msg = messaging.message.text;
+      const atts = messaging.message.attachments;
 
-      // Let's reply with an automatic message
-      FB.fbMessage(
-        sender,
-        {text: 'Me desculpe, eu só entendo mensagens de texto por agora.'}
-      );
-    } else if (msg) {
-      // We received a text message
 
-      // Let's forward the message to the Wit.ai Bot Engine
-      // This will run all actions until our bot has nothing left to do
-      wit.runActions(
-        sessionId, // the user's current session
-        msg, // the user's message
-        sessions[sessionId].context, // the user's current session state
-        (error, context) => {
-          if (error) {
-            console.log('Oops! Got an error from Wit:', error);
-          } else {
-            // Our bot did everything it has to do.
-            // Now it's waiting for further messages to proceed.
-            console.log('Waiting for futher messages.');
+      // TODO handle echo messages to scalate to humans.
+      if (messaging.message.is_echo) {
+        if (msg === "ixe!") {
+          sessions[sessionId].scalated = true;
+        };
 
-            // Based on the session state, you might want to reset the session.
-            // This depends heavily on the business logic of your bot.
-            // Example:
-            // if (context['done']) {
-            //   delete sessions[sessionId];
-            // }
+        if (msg === "bot é com você!") {
+          sessions[sessionId].scalated = false;
+        };
 
-            // Updating the user's current session state
-            sessions[sessionId].context = context;
+        return;
+      }
+
+      // Humans have taken over this session :P
+      if (sessions[sessionId].scalated) return;
+
+      if (atts) {
+        // We received an attachment
+
+        // Let's reply with an automatic message
+        FB.fbMessage(
+          sender,
+          {text: 'Me desculpe, eu só entendo mensagens de texto por agora.'}
+        );
+      } else if (msg) {
+        // We received a text message
+
+        // Let's forward the message to the Wit.ai Bot Engine
+        // This will run all actions until our bot has nothing left to do
+        wit.runActions(
+          sessionId, // the user's current session
+          msg, // the user's message
+          sessions[sessionId].context, // the user's current session state
+          (error, context) => {
+            if (error) {
+              console.log('Oops! Got an error from Wit:', error);
+            } else {
+              // Our bot did everything it has to do.
+              // Now it's waiting for further messages to proceed.
+              console.log('Waiting for futher messages.');
+
+              // Based on the session state, you might want to reset the session.
+              // This depends heavily on the business logic of your bot.
+              // Example:
+              // if (context['done']) {
+              //   delete sessions[sessionId];
+              // }
+
+              // Updating the user's current session state
+              sessions[sessionId].context = context;
+            }
           }
+        );
+      }
+    } else if (messaging.postback) {
+
+      const sender = messaging.sender.id;
+      const sessionId = findOrCreateSession(sender);
+
+      const actionsRunned = (error, context) => {
+        if (error) {
+          console.log('Oops! Got an error from Wit:', error);
+        } else {
+          console.log('Waiting for futher messages.');
+          // Updating the user's current session state
+          sessions[sessionId].context = context;
         }
-      );
+      };
+
+      switch (messaging.postback.payload) {
+        case "get_started_pressed":
+          wit.runActions(sessionId, "Começar!", sessions[sessionId].context, actionsRunned);
+          break;
+        default:
+          console.log("Unimplemented parse for facebook postback messaging: %j", messaging);
+      }
+
+    } else {
+      console.log("Unimplemented parse for facebook messaging: %j", messaging);
     }
   } else {
     console.log("Unimplemented parse for request body: %j", req.body);
