@@ -131,6 +131,8 @@ app.post('/webhook', (req, res) => {
         }
       );
     }
+  } else {
+    console.log("Unimplemented parse for request body:", req.body);
   }
   res.sendStatus(200);
 });

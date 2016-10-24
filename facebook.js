@@ -53,7 +53,17 @@ const getFirstMessagingEntry = (body) => {
 };
 
 
+const getPostbackPayload = (body) => {
+  return body.object === 'page' &&
+    body.entry &&
+    Array.isArray(body.entry) &&
+    body.entry.length > 0 &&
+    body.entry[0] && TODO!qeqw asd
+}
+
+
 module.exports = {
+  getPostbackPayload: getPostbackPayload,
   getFirstMessagingEntry: getFirstMessagingEntry,
   fbMessage: fbMessage,
   fbReq: request
