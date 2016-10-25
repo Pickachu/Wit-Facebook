@@ -76,12 +76,12 @@ app.get('/webhook', (req, res) => {
 
 // The main message handler
 app.post('/webhook', (req, res) => {
+
   // Parsing the Messenger API response
   const messaging = FB.getFirstMessagingEntry(req.body);
   if (messaging) {
 
     if (messaging.message) {
-
       // Yay! We got a new message!
 
       // We retrieve the Facebook user ID of the sender

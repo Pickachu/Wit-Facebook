@@ -4,6 +4,7 @@
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 const requester = require('request');
 const Config = require('./const.js');
+const _ = require('lodash');
 
 const request = requester.defaults({
   uri: 'https://graph.facebook.com/v2.6/me/messages',
@@ -18,6 +19,40 @@ const request = requester.defaults({
 });
 
 
+const typedMessage = (recipientId, message, cb) => {
+  const typingTime = message.typingTime || _.sample([2, 3.5, 4]) * 1000;
+  delete message.typingTime;
+
+  senderAction(recipientId, 'typing_on', (error, data) => {
+    error = error || (data && data.error && data.error.message)
+    cb && error && cb(error, data);
+
+    setTimeout(() => {
+      fbMessage(recipientId, message, (error, data) => {
+        error = error || (data && data.error && data.error.message)
+        cb && cb(error, data);
+      })
+    }, typingTime);
+
+  });
+};
+
+// https://developers.facebook.com/docs/messenger-platform/send-api-reference/sender-actions
+const senderAction = (recipientId, action, cb) => {
+  const options = {
+    form: {
+      recipient: {
+      	id: recipientId
+      },
+      sender_action: action
+    }
+  };
+
+  return request(options, (err, resp, data) => {
+    cb && cb(err || data.error && data.error.message, data);
+  });
+};
+
 const fbMessage = (recipientId, message, cb) => {
   const options = {
     form: {
@@ -29,9 +64,7 @@ const fbMessage = (recipientId, message, cb) => {
   };
 
   return request(options, (err, resp, data) => {
-    if (cb) {
-      cb(err || data.error && data.error.message, data);
-    }
+    cb && cb(err || data.error && data.error.message, data);
   });
 };
 
@@ -54,6 +87,7 @@ const getFirstMessagingEntry = (body) => {
 
 module.exports = {
   getFirstMessagingEntry: getFirstMessagingEntry,
+  typedMessage: typedMessage,
   fbMessage: fbMessage,
   fbReq: request
 };

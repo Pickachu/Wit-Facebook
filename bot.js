@@ -44,13 +44,11 @@ const respond = (context, message) => {
     if (recipientId) {
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
-      FB.fbMessage(recipientId, message, (err, data) => {
+      FB.typedMessage(recipientId, message, (err, data) => {
         if (err) {
           console.log(
             'Oops! An error occurred while forwarding the response to',
-            recipientId,
-            ':',
-            err
+            recipientId, ':', err
           );
         }
 
@@ -94,7 +92,6 @@ const actions = {
     let {context, entities} = request;
     let message, sends = [], duration = firstEntityValue(entities, 'duration');
 
-
     console.log('assess-sleep-quality-based-on-duration | ', JSON.stringify(context));
     console.log(arguments);
     console.log(`   {${Object.keys(entities || {}).join(',')}} \n`);
@@ -119,6 +116,9 @@ const actions = {
 
 
 const getWit = (options) => {
+  console.debug = console.log;
+  options = options || {}
+  options.logger = console;
   return Wit(Object.assign({accessToken: Config.WIT_TOKEN, actions}, options));
 };
 
@@ -129,6 +129,5 @@ exports.getWit = getWit;
 if (require.main === module) {
   console.log("Bot testing mode.");
   const interactive = require('node-wit').interactive;
-  console.debug = console.log;
-  interactive(getWit({logger: console}));
+  interactive(getWit());
 }
