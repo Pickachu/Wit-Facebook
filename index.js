@@ -91,10 +91,13 @@ app.post('/webhook', (req, res) => {
       // This is needed for our bot to figure out the conversation history
       const sessionId = findOrCreateSession(sender);
 
+      console.log('session', sessions[sessionId]);
+
       // We retrieve the message content
       const msg = messaging.message.text;
       const atts = messaging.message.attachments;
 
+      console.log('msg:', msg);
 
       // TODO handle echo messages to scalate to humans.
       if (messaging.message.is_echo) {
