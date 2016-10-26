@@ -99,8 +99,13 @@ app.post('/webhook', (req, res) => {
 
       console.log('msg:', msg);
 
-      // TODO handle echo messages to scalate to humans.
+      // Probably a human is sending a message
       if (messaging.message.is_echo) {
+
+        // Detect user that is receiving our message
+        const sessionId = findOrCreateSession(messaging.recipient.id);
+
+        // scalate when is needed
         if (msg === "ixe!") {
           sessions[sessionId].scalated = true;
         };
